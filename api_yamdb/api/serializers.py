@@ -95,8 +95,8 @@ class SignUpSerializer(serializers.ModelSerializer):
         username = data.get('username')
         email = data.get('email')
         if (
-            User.objects.filter(username=username).exists() and
-            User.objects.get(username=username).email != email
+            User.objects.filter(username=username).exists()
+            and User.objects.get(username=username).email != email
         ):
             raise serializers.ValidationError(
                 f'Username "{username}" уже занять'
