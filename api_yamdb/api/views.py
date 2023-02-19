@@ -72,13 +72,15 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Review, id=review_id)
+        title_id = self.kwargs.get('title_id')
+        review = get_object_or_404(Review, id=review_id, title=title_id)
         comments = review.comments.all()
         return comments
 
     def perform_create(self, serializer):
         review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Review, id=review_id)
+        title_id = self.kwargs.get('title_id')
+        review = get_object_or_404(Review, id=review_id, title=title_id)
         serializer.save(author=self.request.user, review=review)
 
 
@@ -119,7 +121,8 @@ def send_confirmation_code(username):
 def signup(request):
     """ApiView-функция для регистрации."""
     username = request.data.get('username')
-    if User.objects.filter(username=username).exists():
+    email = request.data.get('email')
+    if User.objects.filter(username=username, email=email).exists():
         user = get_object_or_404(User, username=username)
         serializer = SignUpSerializer(user, data=request.data)
         if serializer.is_valid():
@@ -128,15 +131,14 @@ def signup(request):
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+    serializer = SignUpSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        send_confirmation_code(username)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     else:
-        serializer = SignUpSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            send_confirmation_code(username)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -144,18 +146,17 @@ def signup(request):
 def get_token(request):
     """ApiView-функция для получения токена."""
     serializer = TokenSerializer(data=request.data)
-    if serializer.is_valid():
-        username = serializer.validated_data.get('username')
-        confirmation_code = serializer.validated_data.get('confirmation_code')
-        user = get_object_or_404(User, username=username)
-        if default_token_generator.check_token(user, str(confirmation_code)):
-            token_data = {'token': str(AccessToken.for_user(user))}
-            return Response(token_data,
-                            status=status.HTTP_200_OK)
-        return Response('Код подтверждения неверный',
-                        status=status.HTTP_400_BAD_REQUEST)
-    else:
+    if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    username = serializer.validated_data.get('username')
+    confirmation_code = serializer.validated_data.get('confirmation_code')
+    user = get_object_or_404(User, username=username)
+    if default_token_generator.check_token(user, str(confirmation_code)):
+        token_data = {'token': str(AccessToken.for_user(user))}
+        return Response(token_data,
+                        status=status.HTTP_200_OK)
+    return Response('Код подтверждения неверный',
+                    status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):

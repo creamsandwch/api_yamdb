@@ -52,7 +52,8 @@ class Title(models.Model):
     )
     year = models.IntegerField(
         verbose_name='Год',
-        validators=[validator_year]
+        validators=[validator_year],
+        db_index=True
     )
     description = models.TextField(
         verbose_name='Описание',
@@ -154,8 +155,8 @@ class Review(models.Model):
     score = models.IntegerField(
         verbose_name='Оценка',
         validators=(
-            MinValueValidator(1),
-            MaxValueValidator(10)
+            MinValueValidator(1, message='Оценка от 1 до 10'),
+            MaxValueValidator(10, message='Оценка от 1 до 10')
         )
     )
     pub_date = models.DateTimeField(
