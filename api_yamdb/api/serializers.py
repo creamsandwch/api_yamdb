@@ -91,23 +91,12 @@ class SignUpSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'username')
 
-    def validate(self, data):
-        username = data.get('username')
-        email = data.get('email')
-        if (
-            User.objects.filter(username=username).exists()
-            and User.objects.get(username=username).email != email
-        ):
+    def validate_username(self, username):
+        if username == 'me':
             raise serializers.ValidationError(
-                f'Username "{username}" уже занять'
+                'Имя пользователя не может быть "me".'
             )
-        return data
-
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError(
-                'Имя пользователя не может быть "me".')
-        return value
+        return username
 
 
 class TokenSerializer(serializers.Serializer):
