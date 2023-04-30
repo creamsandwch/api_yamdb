@@ -1,36 +1,36 @@
-# Проект YaMDb
-### Проект YaMDb собирает отзывы пользователей на произведения. Сами произведения в YaMDb не хранятся, здесь нельзя посмотреть фильм или послушать музыку.
+# YaMDb
+### The YaMDb project collects users feedback on products. The products themselves are not stored in YaMDb; you cannot watch a movie or listen to music here.
 ___
-### Благодарные или возмущённые пользователи оставляют к произведениям текстовые отзывы и ставят произведению оценку в диапазоне от одного до десяти (целое число); из пользовательских оценок формируется усреднённая оценка произведения — рейтинг (целое число). На одно произведение пользователь может оставить только один отзыв.
+### Grateful or indignant users leave text reviews for the products and rate the product in the range from one to ten; from user ratings, an average rating of the product is formed. A user can leave only one review per work.
 ___
 
-## Локальный запуск проекта
+## Local launch
 
-### Создайте ВО
+### Create a virtual environment
 ```
 python3 -m venv venv
 ```
-### Активируйте ВО
+### Activate virtual environment
 ```
 source venv/bin/activate
 ```
-### Установите зависимости
+### Install dependencies
 ```
 pip install -r requirements.txt
 ```
-### Сделайте миграции
+### Make migrations
 ```
-python manage.py makemigrations/migrate
+python manage.py migrate
 ```
-### Загрузите тестовые данные в БД(не обязательно)
+### Load test database(not necessary)
 ```
 python manage.py download_db
 ```
-### Запустите сервер
+### Start local server
 ```
 python manage.py runserver
 ```
-### По этой ссылке есть подробная документация
+### This link has detailed documentation
 ```
 http://127.0.0.1:8000/redoc/
 ```
